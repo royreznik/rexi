@@ -1,0 +1,37 @@
+name: release
+on:
+  push:
+    tags:
+      - "v*"
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - uses: snok/install-poetry@v1
+      - uses: actions/cache@v3
+        id: cached-poetry-dependencies
+        with:
+          path: .venv
+          key: venv-Linux-3.11-${{ hashFiles('**/pyproject.toml') }}
+      - name: build
+        run: make build
+      - name: Sanity test
+        run: | 
+          pip install dist/*.whl --force-reinstall
+      - name: create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*
+      - name: upload to pypi
+        run: make publish
+        env:
+          POETRY_HTTP_BASIC_PYPI_USERNAME: "__token__"
+          POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN }}
