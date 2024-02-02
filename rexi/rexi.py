@@ -34,7 +34,7 @@ class RexiApp(App[ReturnType]):
     def __init__(self, input_content: str):
         super().__init__()
         self.input_content: str = input_content
-        self.regex_modes: list[str] = ["match", "finditer"]
+        self.regex_modes: list[str] = ["finditer", "match"]
         self.regex_current_mode: str = self.regex_modes[0]
 
     def compose(self) -> ComposeResult:
