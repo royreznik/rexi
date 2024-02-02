@@ -1,0 +1,17 @@
+Input {
+    dock: top;
+    width: 100%;
+}
+
+#output-container {
+    height: 70%;
+}
+
+#select {
+    dock: right;
+    width: 20%;
+}
+
+#inputs {
+    height: 4;
+}

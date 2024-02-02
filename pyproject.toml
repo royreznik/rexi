@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "rexi"
+version = "0.0.0"
+description = ""
+authors = ["Roy Reznik <royreznik@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+rexi = "rexi.rexi:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+textual = "^0.48.1"
+colorama = "^0.4.6"
+
+
+[tool.poetry.group.dev.dependencies]
+textual-dev = "^1.4.0"
+black = "^24.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
