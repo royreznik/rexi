@@ -2,11 +2,11 @@ import dataclasses
 import os
 import re
 import sys
-from typing import cast
+from typing import cast, Match, Iterable, Optional
 
 from colorama import Fore
 from textual import on
-from textual.app import App, ComposeResult
+from textual.app import App, ComposeResult, ReturnType
 from textual.containers import ScrollableContainer, Horizontal
 from textual.widgets import Input, Static, Header, Select
 
@@ -18,15 +18,17 @@ class GroupMatch:
     start: int
     end: int
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, GroupMatch):
+            return False
         return self.start == other.start and self.end == other.end
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Group \"{'|'.join(map(str, self.keys))}\": \"{self.value}\""
 
 
 # noinspection SpellCheckingInspection
-class RexiApp(App):
+class RexiApp(App[ReturnType]):
     CSS_PATH = "rexi.tcss"
 
     def __init__(self, input_content: str):
@@ -38,7 +40,9 @@ class RexiApp(App):
     def compose(self) -> ComposeResult:
         with Horizontal(id="inputs"):
             yield Input(placeholder="Enter regex pattern")
-            yield Select(zip(self.regex_modes, self.regex_modes), id="select", allow_blank=False)
+            yield Select(
+                zip(self.regex_modes, self.regex_modes), id="select", allow_blank=False
+            )
 
         with ScrollableContainer(id="result"):
             with ScrollableContainer(id="output-container"):
@@ -56,7 +60,7 @@ class RexiApp(App):
 
     @on(Select.Changed)
     async def on_select_changed(self, message: Select.Changed) -> None:
-        self.regex_current_mode = message.value
+        self.regex_current_mode = cast(str, message.value)
         self.run_worker(
             self.update_regex(cast(Input, self.query_one("Input")).value),
             exclusive=True,
@@ -70,7 +74,7 @@ class RexiApp(App):
         if str_pattern:
             try:
                 pattern = re.compile(str_pattern, re.MULTILINE)
-                matches = None
+                matches: Optional[Iterable[Optional[Match[str]]]] = None
                 if self.regex_current_mode == "match":
                     matches = [pattern.match(self.input_content)]
                 elif self.regex_current_mode == "finditer":
@@ -101,12 +105,12 @@ class RexiApp(App):
     def create_groups_output(groups_matches: list["GroupMatch"]) -> str:
         return "\n".join(map(repr, groups_matches))
 
-    def combine_matches_groups(self, matches: list[re.Match]) -> list["GroupMatch"]:
+    def combine_matches_groups(self, matches: Iterable[Optional[Match[str]]]) -> list["GroupMatch"]:
         groups = [self._combine_groups(match) for match in matches if match]
         return [g for group in groups for g in group]
 
     @staticmethod
-    def _combine_groups(match: re.Match) -> list["GroupMatch"]:
+    def _combine_groups(match: Match[str]) -> list["GroupMatch"]:
         groups = [
             GroupMatch([index], group, start, end)
             for index, (group, (start, end)) in enumerate(
@@ -121,14 +125,10 @@ class RexiApp(App):
         return groups
 
 
-def main():
+def main() -> None:
     stdin = sys.stdin.read()
     os.close(sys.stdin.fileno())
-    sys.stdin = open("/dev/tty", "rb")
+    sys.stdin = open("/dev/tty", "rb")  # type: ignore[assignment]
 
-    app = RexiApp(stdin)
+    app: RexiApp[int] = RexiApp(stdin)
     app.run()
-
-
-if __name__ == "__main__":
-    main()

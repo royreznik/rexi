@@ -1,9 +1,18 @@
 [tool.poetry]
 name = "rexi"
 version = "0.0.0"
-description = ""
+description = "Simpel and Interactive regex shell"
 authors = ["Roy Reznik <royreznik@gmail.com>"]
 readme = "README.md"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
 
 [tool.poetry.scripts]
 rexi = "rexi.rexi:main"
@@ -17,6 +26,38 @@ colorama = "^0.4.6"
 [tool.poetry.group.dev.dependencies]
 textual-dev = "^1.4.0"
 black = "^24.1.1"
+pytest = "^7.4.3"
+ruff = "^0.1.9"
+mypy = "^1.8.0"
+pytest-cov = "^4.1.0"
+bump-my-version = "^0.15.4"
+types-colorama = "^0.4.15.20240106"
+
+
+[tool.mypy]
+strict = true
+
+
+[tool.bumpversion]
+current_version = "0.0.0"
+commit = true
+tag = true
+tag_name = "v{new_version}"
+message = "Version updated from {current_version} to {new_version}"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)(\\.(?P<dev>\\d+))?"
+serialize = [
+    "{major}.{minor}.{patch}.{dev}",
+    "{major}.{minor}.{patch}"
+]
+
+[[tool.bumpversion.files]]
+filename = "rexi/__init__.py"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+regex = true
+search = "^version = \"{current_version}\""
+replace = "version = \"{new_version}\""
 
 [build-system]
 requires = ["poetry-core"]
