@@ -2,13 +2,15 @@
      <a><img src="./docs/rexi.png" alt="Rexi"></a>
 </p>
 
----
-[![Tests](https://github.com/royreznik/rexi/actions/workflows/tests.yml/badge.svg)](https://github.com/royreznik/greps/actions/workflows/tests.yml)
-![GitHub License](https://img.shields.io/github/license/royreznik/rexi)
-[![codecov](https://codecov.io/gh/royreznik/rexi/graph/badge.svg?token=LOIYAMEI08)](https://codecov.io/gh/royreznik/rexi)![PyPI - Python Version](https://img.shields.io/pypi/pyversions/greps)
-![Code style](https://img.shields.io/badge/code%20style-black-black)
+<p align="center">
+     <a href="https://github.com/royreznik/greps/actions/workflows/tests.yml"><img src="https://github.com/royreznik/rexi/actions/workflows/tests.yml/badge.svg" alt="Testing"></a>
+     <a href="https://img.shields.io/github/license/royreznik/rexi"><img src="https://img.shields.io/github/license/royreznik/rexi" alt="License"></a>
+     <a href="https://codecov.io/gh/royreznik/rexi"><img src="https://codecov.io/gh/royreznik/rexi/graph/badge.svg?token=LOIYAMEI08" alt="coverage"></a>
+     <a href="https://pypi.org/project/rexi/"><img src="https://img.shields.io/pypi/pyversions/rexi" alt="versions"></a>
+     <img src="https://img.shields.io/badge/code%20style-black-black" alt="style">
+</p>
 
-# Regex Terminal UI
+---
 
 `rexi` is a simple yet powerful CLI tool designed for developers, data scientists, and anyone interested in working with regular expressions directly from the terminal.
 Built with Python and leveraging the `textual` library, `rexi` offers a user-friendly terminal UI to interactively work with regular expressions.
