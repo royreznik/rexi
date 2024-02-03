@@ -1,5 +1,5 @@
 <p align="center">
-     <a><img src="./docs/rexi.png" alt="Rexi"></a>
+     <a><img src="https://github.com/royreznik/rexi/blob/master/docs/rexi.png" alt="Rexi"></a>
 </p>
 
 <p align="center">
@@ -14,7 +14,7 @@
 
 `rexi` is a simple yet powerful CLI tool designed for developers, data scientists, and anyone interested in working with regular expressions directly from the terminal.
 Built with Python and leveraging the `textual` library, `rexi` offers a user-friendly terminal UI to interactively work with regular expressions.
-![Demo](./docs/demo.gif)
+![Demo](https://github.com/royreznik/rexi/blob/master/docs/demo.gif)
 
 ## Features
 
