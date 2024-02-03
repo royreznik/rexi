@@ -1,10 +1,8 @@
 import dataclasses
-import os
 import re
-import sys
 from typing import cast, Match, Iterable, Optional
 
-from colorama import Fore, Style
+from colorama import Fore
 from textual import on
 from textual.app import App, ComposeResult, ReturnType
 from textual.containers import ScrollableContainer, Horizontal
@@ -45,7 +43,10 @@ class RexiApp(App[ReturnType]):
         with Horizontal(id="inputs"):
             yield Input(placeholder="Enter regex pattern")
             yield Select(
-                zip(self.regex_modes, self.regex_modes), id="select", allow_blank=False, value=self.regex_current_mode
+                zip(self.regex_modes, self.regex_modes),
+                id="select",
+                allow_blank=False,
+                value=self.regex_current_mode,
             )
 
         with ScrollableContainer(id="result"):
@@ -132,12 +133,7 @@ class RexiApp(App[ReturnType]):
 
     @staticmethod
     def _combine_groups(match: Match[str]) -> list["GroupMatch"]:
-        groups = [
-            GroupMatch([index], group, start, end, is_first=True)
-            for index, (group, (start, end)) in enumerate(
-                [[match.group(0), match.regs[0]]]
-            )
-        ]
+        groups = [GroupMatch([0], match.group(0), *match.regs[0], is_first=True)]
         groups += [
             GroupMatch([index], group, start, end)
             for index, (group, (start, end)) in enumerate(
@@ -151,16 +147,3 @@ class RexiApp(App[ReturnType]):
             if group_match in groups:
                 groups[groups.index(group_match)].keys.append(group_name)
         return groups
-
-
-def main() -> None:
-    stdin = sys.stdin.read()
-    os.close(sys.stdin.fileno())
-    sys.stdin = open("/dev/tty", "rb")  # type: ignore[assignment]
-
-    app: RexiApp[int] = RexiApp(stdin)
-    app.run()
-
-
-if __name__ == "__main__":
-    main()

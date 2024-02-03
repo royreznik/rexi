@@ -17,7 +17,7 @@ from rexi.rexi import GroupMatch, RexiApp
 )
 def test_group_match_equals(
     group_one: GroupMatch, group_two: GroupMatch, expected_equals: bool
-):
+) -> None:
     assert (group_one == group_two) == expected_equals
 
 
@@ -42,7 +42,8 @@ def test_group_match_equals(
         ],
     ],
 )
-def test_combine_groups(pattern, content, expected_groups):
+def test_combine_groups(pattern: str, content: str, expected_groups: list[GroupMatch]) -> None:
     matches = re.match(pattern, content)
+    assert matches  # sanity
     result = RexiApp._combine_groups(matches)
     assert result == expected_groups, result[0].end

@@ -1,0 +1,56 @@
+name: Test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths:
+      - rexi/**
+      - tests/**
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - uses: snok/install-poetry@v1
+      - uses: actions/cache@v3
+        id: cached-poetry-dependencies
+        with:
+          path: .venv
+          key: venv-Linux-3.11-${{ hashFiles('**/pyproject.toml') }}
+      - name: install deps
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: make install
+      - name: lint
+        run: make lint
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: snok/install-poetry@v1
+      - uses: actions/cache@v3
+        id: cached-poetry-dependencies
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
+      - name: install deps
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: rm -rf poetry.lock && make install
+      - name: test
+        run: make test
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

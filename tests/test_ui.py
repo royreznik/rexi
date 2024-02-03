@@ -2,36 +2,43 @@ from typing import cast
 
 import pytest
 from colorama import Fore
-from textual.pilot import Pilot
 from textual.widgets import Static
 
 from rexi.rexi import RexiApp, UNDERLINE, RESET_UNDERLINE
 
+
 @pytest.mark.parametrize(
     ("start_mode", "pattern", "expected_output"),
     [
-        ["match", ".*(aTe).*", f"{UNDERLINE}This iS! {Fore.RED}aTe{Fore.RESET} xt2 F0r T3sT!ng{RESET_UNDERLINE}"],
-        ["match", ".*(aTe.*)", f"{UNDERLINE}This iS! {Fore.RED}aTe xt2 F0r T3sT!ng{Fore.RESET}{RESET_UNDERLINE}"],
-        ["finditer", "(aTe)", f"This iS! {UNDERLINE}{Fore.RED}aTe{Fore.RESET}{RESET_UNDERLINE} xt2 F0r T3sT!ng"]
-    ]
+        [
+            "match",
+            ".*(aTe).*",
+            f"{UNDERLINE}This iS! {Fore.RED}aTe{Fore.RESET} xt2 F0r T3sT!ng{RESET_UNDERLINE}",
+        ],
+        [
+            "match",
+            ".*(aTe.*)",
+            f"{UNDERLINE}This iS! {Fore.RED}aTe xt2 F0r T3sT!ng{Fore.RESET}{RESET_UNDERLINE}",
+        ],
+        [
+            "finditer",
+            "(aTe)",
+            f"This iS! {UNDERLINE}{Fore.RED}aTe{Fore.RESET}{RESET_UNDERLINE} xt2 F0r T3sT!ng",
+        ],
+    ],
 )
-async def test_input_box(start_mode, pattern, expected_output):
-    app = RexiApp("This iS! aTe xt2 F0r T3sT!ng", start_mode=start_mode)
+async def test_input_box(start_mode: str, pattern: str, expected_output: str) -> None:
+    app: RexiApp[int] = RexiApp("This iS! aTe xt2 F0r T3sT!ng", start_mode=start_mode)
     async with app.run_test() as pilot:
-        pilot: Pilot
         await pilot.click("Input")
         await pilot.press(*list(pattern))
         result = str(cast(Static, app.query_one("#output")).renderable)
-        assert (
-                result
-                == expected_output
-        )
+        assert result == expected_output
 
 
-async def test_switch_modes():
-    app = RexiApp("This iS! aTe xt2 F0r T3sT!ng")
+async def test_switch_modes() -> None:
+    app: RexiApp[int] = RexiApp("This iS! aTe xt2 F0r T3sT!ng")
     async with app.run_test() as pilot:
-        pilot: Pilot
         assert app.regex_current_mode == "finditer"
         await pilot.click("SelectCurrent")
         await pilot.click("SelectOverlay", offset=(2, 2))
