@@ -4,11 +4,14 @@ import re
 import sys
 from typing import cast, Match, Iterable, Optional
 
-from colorama import Fore
+from colorama import Fore, Style
 from textual import on
 from textual.app import App, ComposeResult, ReturnType
 from textual.containers import ScrollableContainer, Horizontal
 from textual.widgets import Input, Static, Header, Select
+
+UNDERLINE = "\033[4m"
+RESET_UNDERLINE = "\033[24m"
 
 
 @dataclasses.dataclass
@@ -17,6 +20,7 @@ class GroupMatch:
     value: str
     start: int
     end: int
+    is_first: bool = False
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, GroupMatch):
@@ -31,17 +35,17 @@ class GroupMatch:
 class RexiApp(App[ReturnType]):
     CSS_PATH = "rexi.tcss"
 
-    def __init__(self, input_content: str):
+    def __init__(self, input_content: str, start_mode: str = "finditer"):
         super().__init__()
         self.input_content: str = input_content
         self.regex_modes: list[str] = ["finditer", "match"]
-        self.regex_current_mode: str = self.regex_modes[0]
+        self.regex_current_mode: str = start_mode
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="inputs"):
             yield Input(placeholder="Enter regex pattern")
             yield Select(
-                zip(self.regex_modes, self.regex_modes), id="select", allow_blank=False
+                zip(self.regex_modes, self.regex_modes), id="select", allow_blank=False, value=self.regex_current_mode
             )
 
         with ScrollableContainer(id="result"):
@@ -91,32 +95,56 @@ class RexiApp(App[ReturnType]):
 
     def create_highlighted_output(self, groups_matches: list["GroupMatch"]) -> str:
         output = ""
-        starts = {group.start for group in groups_matches}
-        ends = {group.end for group in groups_matches}
-        for character in range(len(self.input_content)):
+        starts = {group.start for group in groups_matches if not group.is_first}
+        first_starts = {group.start for group in groups_matches if group.is_first}
+        ends = {group.end for group in groups_matches if not group.is_first}
+        first_ends = {group.end for group in groups_matches if group.is_first}
+        input_length = len(self.input_content)
+        for character in range(input_length):
+            if character in first_starts:
+                output += UNDERLINE
             if character in starts:
                 output += Fore.RED
-            output += self.input_content[character]
             if character in ends:
                 output += Fore.RESET
+            if character in first_ends:
+                output += RESET_UNDERLINE
+            output += self.input_content[character]
+
+        if input_length in ends:
+            output += Fore.RESET
+        if input_length in first_ends:
+            output += RESET_UNDERLINE
+
         return output
 
     @staticmethod
     def create_groups_output(groups_matches: list["GroupMatch"]) -> str:
-        return "\n".join(map(repr, groups_matches))
+        return "\n".join(
+            [repr(group) for group in groups_matches if not group.is_first]
+        )
 
-    def combine_matches_groups(self, matches: Iterable[Optional[Match[str]]]) -> list["GroupMatch"]:
+    def combine_matches_groups(
+        self, matches: Iterable[Optional[Match[str]]]
+    ) -> list["GroupMatch"]:
         groups = [self._combine_groups(match) for match in matches if match]
         return [g for group in groups for g in group]
 
     @staticmethod
     def _combine_groups(match: Match[str]) -> list["GroupMatch"]:
         groups = [
-            GroupMatch([index], group, start, end)
+            GroupMatch([index], group, start, end, is_first=True)
             for index, (group, (start, end)) in enumerate(
-                zip(match.groups(), match.regs)
+                [[match.group(0), match.regs[0]]]
             )
         ]
+        groups += [
+            GroupMatch([index], group, start, end)
+            for index, (group, (start, end)) in enumerate(
+                zip(match.groups(), match.regs[1:]), start=1
+            )
+        ]
+
         for group_name, group in match.groupdict().items():
             start, end = match.span(group_name)
             group_match = GroupMatch([group_name], group, start, end)
@@ -132,3 +160,7 @@ def main() -> None:
 
     app: RexiApp[int] = RexiApp(stdin)
     app.run()
+
+
+if __name__ == "__main__":
+    main()

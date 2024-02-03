@@ -32,6 +32,8 @@ mypy = "^1.8.0"
 pytest-cov = "^4.1.0"
 bump-my-version = "^0.15.4"
 types-colorama = "^0.4.15.20240106"
+pytest-asyncio = "^0.23.4"
+ipdb = "^0.13.13"
 
 
 [tool.mypy]
@@ -59,7 +61,8 @@ regex = true
 search = "^version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 
-
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 [build-system]
 requires = ["poetry-core"]
