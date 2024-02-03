@@ -12,7 +12,7 @@
 
 `rexi` is a simple yet powerful CLI tool designed for developers, data scientists, and anyone interested in working with regular expressions directly from the terminal.
 Built with Python and leveraging the `textual` library, `rexi` offers a user-friendly terminal UI to interactively work with regular expressions.
-![Demo](./docs/usage.gif)
+![Demo](./docs/demo.gif)
 
 ## Features
 
