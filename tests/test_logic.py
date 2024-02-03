@@ -42,7 +42,9 @@ def test_group_match_equals(
         ],
     ],
 )
-def test_combine_groups(pattern: str, content: str, expected_groups: list[GroupMatch]) -> None:
+def test_combine_groups(
+    pattern: str, content: str, expected_groups: list[GroupMatch]
+) -> None:
     matches = re.match(pattern, content)
     assert matches  # sanity
     result = RexiApp._combine_groups(matches)
