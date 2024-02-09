@@ -12,14 +12,13 @@ app = typer.Typer()
 # noinspection SpellCheckingInspection
 @app.command("rexi")
 def rexi_cli(
-    input_file: Optional[Annotated[
-        typer.FileText,
+    input_file: Annotated[
+        Optional[typer.FileText],
         typer.Option(
-            "-i",
-            "--input",
-            rich_help_panel="Input file to pass to rexi; if not provided, stdin will be used.",
+            "--input", "-i",
+            help="Input file to pass to rexi; if not provided, stdin will be used.",
         ),
-    ]] = None,
+    ] = None,
 ) -> None:
     if input_file:
         input_text = input_file.read()
