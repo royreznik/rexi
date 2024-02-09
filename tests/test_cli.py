@@ -4,6 +4,7 @@ from unittest.mock import Mock
 
 from _pytest.monkeypatch import MonkeyPatch
 from typer.testing import CliRunner
+
 from rexi.cli import app
 
 

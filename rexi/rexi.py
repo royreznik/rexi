@@ -1,12 +1,12 @@
 import dataclasses
 import re
-from typing import cast, Match, Iterable, Optional
+from typing import Iterable, Match, Optional, cast
 
 from colorama import Fore
 from textual import on
 from textual.app import App, ComposeResult, ReturnType
-from textual.containers import ScrollableContainer, Horizontal
-from textual.widgets import Input, Static, Header, Select
+from textual.containers import Horizontal, ScrollableContainer
+from textual.widgets import Header, Input, Select, Static
 
 UNDERLINE = "\033[4m"
 RESET_UNDERLINE = "\033[24m"
@@ -44,7 +44,8 @@ class RexiApp(App[ReturnType]):
         initial_mode = initial_mode or RexiApp.AVAILABLE_MODES[0]
         if initial_mode not in RexiApp.AVAILABLE_MODES:
             raise ValueError(
-                f"This regex mode isn't supported!, please choose from the following list: {RexiApp.AVAILABLE_MODES}"
+                f"This regex mode isn't supported!"
+                f"please choose from the following list: {RexiApp.AVAILABLE_MODES}"
             )
 
         super().__init__()

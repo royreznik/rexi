@@ -4,7 +4,7 @@ import pytest
 from colorama import Fore
 from textual.widgets import Static
 
-from rexi.rexi import RexiApp, UNDERLINE, RESET_UNDERLINE
+from rexi.rexi import RESET_UNDERLINE, UNDERLINE, RexiApp
 
 
 @pytest.mark.parametrize(
@@ -13,17 +13,17 @@ from rexi.rexi import RexiApp, UNDERLINE, RESET_UNDERLINE
         [
             "match",
             ".*(aTe).*",
-            f"{UNDERLINE}This iS! {Fore.RED}aTe{Fore.RESET} xt2 F0r T3sT!ng{RESET_UNDERLINE}",
+            f"{UNDERLINE}This iS! {Fore.RED}aTe{Fore.RESET} xt2 F0r T3sT!ng{RESET_UNDERLINE}",  # noqa: E501
         ],
         [
             "match",
             ".*(aTe.*)",
-            f"{UNDERLINE}This iS! {Fore.RED}aTe xt2 F0r T3sT!ng{Fore.RESET}{RESET_UNDERLINE}",
+            f"{UNDERLINE}This iS! {Fore.RED}aTe xt2 F0r T3sT!ng{Fore.RESET}{RESET_UNDERLINE}",  # noqa: E501
         ],
         [
             "finditer",
             "(aTe)",
-            f"This iS! {UNDERLINE}{Fore.RED}aTe{Fore.RESET}{RESET_UNDERLINE} xt2 F0r T3sT!ng",
+            f"This iS! {UNDERLINE}{Fore.RED}aTe{Fore.RESET}{RESET_UNDERLINE} xt2 F0r T3sT!ng",  # noqa: E501
         ],
     ],
 )
@@ -44,7 +44,7 @@ async def test_input_box_with_initial_pattern() -> None:
         result = str(cast(Static, app.query_one("#output")).renderable)
         assert (
             result
-            == f"{UNDERLINE}{Fore.RED}This iS!{Fore.RESET}{RESET_UNDERLINE} aTe xt2 F0r T3sT!ng"
+            == f"{UNDERLINE}{Fore.RED}This iS!{Fore.RESET}{RESET_UNDERLINE} aTe xt2 F0r T3sT!ng"  # noqa: E501
         )
 
 
