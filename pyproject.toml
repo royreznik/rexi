@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rexi"
-version = "1.0.1"
+version = "1.1.0"
 description = "Simpel and Interactive regex shell"
 authors = ["Roy Reznik <royreznik@gmail.com>"]
 readme = "README.md"
@@ -46,7 +46,7 @@ strict = true
 
 
 [tool.bumpversion]
-current_version = "1.0.1"
+current_version = "1.1.0"
 commit = true
 tag = true
 tag_name = "v{new_version}"
@@ -68,8 +68,10 @@ replace = "version = \"{new_version}\""
 
 
 
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
 
 
 
