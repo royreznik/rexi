@@ -1,5 +1,5 @@
 BUMP_PART ?=
-
+PYTEST_COV ?= xml
 setup:
 	python3 -m pip install poetry
 
@@ -7,7 +7,7 @@ install:
 	poetry install
 
 test:
-	poetry run pytest -ssv --cov --cov-report=xml
+	poetry run pytest -ssv --cov --cov-report=$(PYTEST_COV)
 
 build:
 	poetry build

@@ -33,15 +33,21 @@ class GroupMatch:
 class RexiApp(App[ReturnType]):
     CSS_PATH = "rexi.tcss"
 
-    def __init__(self, input_content: str, start_mode: str = "finditer"):
+    def __init__(
+        self,
+        input_content: str,
+        start_mode: str = "finditer",
+        initial_pattern: Optional[str] = None,
+    ):
         super().__init__()
         self.input_content: str = input_content
         self.regex_modes: list[str] = ["finditer", "match"]
         self.regex_current_mode: str = start_mode
+        self.initial_pattern = initial_pattern
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="inputs"):
-            yield Input(placeholder="Enter regex pattern")
+            yield Input(value=self.initial_pattern, placeholder="Enter regex pattern")
             yield Select(
                 zip(self.regex_modes, self.regex_modes),
                 id="select",

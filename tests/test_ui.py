@@ -36,6 +36,18 @@ async def test_input_box(start_mode: str, pattern: str, expected_output: str) ->
         assert result == expected_output
 
 
+async def test_input_box_with_initial_pattern() -> None:
+    app: RexiApp[int] = RexiApp(
+        "This iS! aTe xt2 F0r T3sT!ng", initial_pattern="(This.*iS!)"
+    )
+    async with app.run_test():
+        result = str(cast(Static, app.query_one("#output")).renderable)
+        assert (
+            result
+            == f"{UNDERLINE}{Fore.RED}This iS!{Fore.RESET}{RESET_UNDERLINE} aTe xt2 F0r T3sT!ng"
+        )
+
+
 async def test_switch_modes() -> None:
     app: RexiApp[int] = RexiApp("This iS! aTe xt2 F0r T3sT!ng")
     async with app.run_test() as pilot:
