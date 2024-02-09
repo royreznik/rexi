@@ -33,16 +33,24 @@ class GroupMatch:
 class RexiApp(App[ReturnType]):
     CSS_PATH = "rexi.tcss"
 
+    AVAILABLE_MODES = ["finditer", "match"]
+
     def __init__(
         self,
         input_content: str,
-        start_mode: str = "finditer",
+        initial_mode: Optional[str] = None,
         initial_pattern: Optional[str] = None,
     ):
+        initial_mode = initial_mode or RexiApp.AVAILABLE_MODES[0]
+        if initial_mode not in RexiApp.AVAILABLE_MODES:
+            raise ValueError(
+                f"This regex mode isn't supported!, please choose from the following list: {RexiApp.AVAILABLE_MODES}"
+            )
+
         super().__init__()
         self.input_content: str = input_content
-        self.regex_modes: list[str] = ["finditer", "match"]
-        self.regex_current_mode: str = start_mode
+        self.regex_modes: list[str] = RexiApp.AVAILABLE_MODES
+        self.regex_current_mode: str = initial_mode
         self.initial_pattern = initial_pattern
 
     def compose(self) -> ComposeResult:
