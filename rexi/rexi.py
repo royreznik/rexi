@@ -38,9 +38,10 @@ class RexiApp(App[ReturnType]):
     def __init__(
         self,
         input_content: str,
-        initial_mode: str = AVAILABLE_MODES[0],
+        initial_mode: Optional[str] = None,
         initial_pattern: Optional[str] = None,
     ):
+        initial_mode = initial_mode or RexiApp.AVAILABLE_MODES[0]
         if initial_mode not in RexiApp.AVAILABLE_MODES:
             raise ValueError(
                 f"This regex mode isn't supported!, please choose from the following list: {RexiApp.AVAILABLE_MODES}"

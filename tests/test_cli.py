@@ -23,7 +23,9 @@ def test_on_args(monkeypatch: MonkeyPatch) -> None:
         monkeypatch.setattr("builtins.open", open_mock)
         runner.invoke(app, input=a)
     open_mock.assert_called_once_with("/dev/tty", "rb")
-    class_mock.assert_called_once_with(text.decode(), initial_mode=None, initial_pattern=None)
+    class_mock.assert_called_once_with(
+        text.decode(), initial_mode=None, initial_pattern=None
+    )
     instance_mock.run.assert_called_once()
 
 

@@ -60,4 +60,4 @@ async def test_switch_modes() -> None:
 
 async def test_invalide_mode() -> None:
     with pytest.raises(ValueError):
-        app: RexiApp[int] = RexiApp("random text", initial_mode="NON-EXISTING-MODE")
+        RexiApp("random text", initial_mode="NON-EXISTING-MODE")

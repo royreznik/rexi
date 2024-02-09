@@ -46,5 +46,7 @@ def rexi_cli(
         except OSError:
             pass
         sys.stdin = open("/dev/tty", "rb")  # type: ignore[assignment]
-    app: RexiApp[int] = RexiApp(input_text, initial_mode=initial_mode, initial_pattern=initial_pattern)
+    app: RexiApp[int] = RexiApp(
+        input_text, initial_mode=initial_mode, initial_pattern=initial_pattern
+    )
     app.run()
