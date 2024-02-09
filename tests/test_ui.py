@@ -28,7 +28,7 @@ from rexi.rexi import RexiApp, UNDERLINE, RESET_UNDERLINE
     ],
 )
 async def test_input_box(start_mode: str, pattern: str, expected_output: str) -> None:
-    app: RexiApp[int] = RexiApp("This iS! aTe xt2 F0r T3sT!ng", start_mode=start_mode)
+    app: RexiApp[int] = RexiApp("This iS! aTe xt2 F0r T3sT!ng", initial_mode=start_mode)
     async with app.run_test() as pilot:
         await pilot.click("Input")
         await pilot.press(*list(pattern))
@@ -56,3 +56,8 @@ async def test_switch_modes() -> None:
         await pilot.click("SelectOverlay", offset=(2, 2))
         await pilot.wait_for_animation()
         assert app.regex_current_mode == "match"
+
+
+async def test_invalide_mode() -> None:
+    with pytest.raises(ValueError):
+        app: RexiApp[int] = RexiApp("random text", initial_mode="NON-EXISTING-MODE")

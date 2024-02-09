@@ -28,6 +28,14 @@ def rexi_cli(
             help="Initial regex pattern to use",
         ),
     ] = None,
+    initial_mode: Annotated[
+        Optional[str],
+        typer.Option(
+            "--mode",
+            "-m",
+            help="Initial regex mode to use",
+        ),
+    ] = None,
 ) -> None:
     if input_file:
         input_text = input_file.read()
@@ -38,5 +46,5 @@ def rexi_cli(
         except OSError:
             pass
         sys.stdin = open("/dev/tty", "rb")  # type: ignore[assignment]
-    app: RexiApp[int] = RexiApp(input_text, initial_pattern=initial_pattern)
+    app: RexiApp[int] = RexiApp(input_text, initial_mode=initial_mode, initial_pattern=initial_pattern)
     app.run()
