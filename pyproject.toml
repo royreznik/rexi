@@ -38,6 +38,8 @@ types-colorama = "^0.4.15.20240106"
 pytest-asyncio = "^0.23.4"
 ipdb = "^0.13.13"
 
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
 
 [tool.mypy]
 strict = true
