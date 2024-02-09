@@ -1,4 +1,5 @@
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import Mock
 
 from _pytest.monkeypatch import MonkeyPatch
@@ -6,7 +7,7 @@ from typer.testing import CliRunner
 from rexi.cli import app
 
 
-def test_app(monkeypatch: MonkeyPatch) -> None:
+def test_stdin_cli(monkeypatch: MonkeyPatch) -> None:
     """
     Couldn't find a better way to test the CLI without patching everything :(
     """
@@ -24,3 +25,16 @@ def test_app(monkeypatch: MonkeyPatch) -> None:
     open_mock.assert_called_once_with("/dev/tty", "rb")
     class_mock.assert_called_once_with(text.decode())
     instance_mock.run.assert_called_once()
+
+
+def test_file_input_cli(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
+    runner = CliRunner()
+    text = "This iS! aTe xt2 F0r T3sT!ng"
+    (tmp_path / "text_file").write_text(text)
+    class_mock = Mock()
+    instance_mock = Mock()
+    with monkeypatch.context():
+        class_mock.return_value = instance_mock
+        monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
+        runner.invoke(app, args=["-i", str(tmp_path / "text_file")])
+    class_mock.assert_called_once_with(text)
