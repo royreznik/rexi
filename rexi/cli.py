@@ -15,8 +15,17 @@ def rexi_cli(
     input_file: Annotated[
         Optional[typer.FileText],
         typer.Option(
-            "--input", "-i",
+            "--input",
+            "-i",
             help="Input file to pass to rexi; if not provided, stdin will be used.",
+        ),
+    ] = None,
+    initial_pattern: Annotated[
+        Optional[str],
+        typer.Option(
+            "--pattern",
+            "-p",
+            help="Initial regex pattern to use",
         ),
     ] = None,
 ) -> None:
@@ -29,5 +38,5 @@ def rexi_cli(
         except OSError:
             pass
         sys.stdin = open("/dev/tty", "rb")  # type: ignore[assignment]
-    app: RexiApp[int] = RexiApp(input_text)
+    app: RexiApp[int] = RexiApp(input_text, initial_pattern=initial_pattern)
     app.run()

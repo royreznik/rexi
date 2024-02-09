@@ -7,7 +7,7 @@ from typer.testing import CliRunner
 from rexi.cli import app
 
 
-def test_stdin_cli(monkeypatch: MonkeyPatch) -> None:
+def test_on_args(monkeypatch: MonkeyPatch) -> None:
     """
     Couldn't find a better way to test the CLI without patching everything :(
     """
@@ -23,11 +23,11 @@ def test_stdin_cli(monkeypatch: MonkeyPatch) -> None:
         monkeypatch.setattr("builtins.open", open_mock)
         runner.invoke(app, input=a)
     open_mock.assert_called_once_with("/dev/tty", "rb")
-    class_mock.assert_called_once_with(text.decode())
+    class_mock.assert_called_once_with(text.decode(), initial_pattern=None)
     instance_mock.run.assert_called_once()
 
 
-def test_file_input_cli(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
+def test_file_input(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
     runner = CliRunner()
     text = "This iS! aTe xt2 F0r T3sT!ng"
     (tmp_path / "text_file").write_text(text)
@@ -37,4 +37,16 @@ def test_file_input_cli(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
         class_mock.return_value = instance_mock
         monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
         runner.invoke(app, args=["-i", str(tmp_path / "text_file")])
-    class_mock.assert_called_once_with(text)
+    class_mock.assert_called_once_with(text, initial_pattern=None)
+
+
+def test_initial_pattern(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
+    runner = CliRunner()
+    class_mock = Mock()
+    instance_mock = Mock()
+    with monkeypatch.context():
+        class_mock.return_value = instance_mock
+        monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
+        result = runner.invoke(app, input="", args=["-p", "(wtf)"])
+        print(result.output)
+    class_mock.assert_called_once_with("", initial_pattern="(wtf)")
