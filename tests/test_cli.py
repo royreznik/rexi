@@ -18,11 +18,16 @@ def test_on_args(monkeypatch: MonkeyPatch) -> None:
     class_mock = Mock()
     instance_mock = Mock()
     open_mock = Mock()
+    select = Mock()
+
     with monkeypatch.context():
+        select.return_value = [[True]]
         class_mock.return_value = instance_mock
+        monkeypatch.setattr("select.select", select)
         monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
         monkeypatch.setattr("builtins.open", open_mock)
         runner.invoke(app, input=a)
+
     open_mock.assert_called_once_with("/dev/tty", "rb")
     class_mock.assert_called_once_with(
         text.decode(), initial_mode=None, initial_pattern=None
@@ -67,3 +72,16 @@ def test_initial_mode(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
         monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
         runner.invoke(app, args=["-i", str(tmp_path / "text_file"), "--mode", "match"])
     class_mock.assert_called_once_with(text, initial_mode="match", initial_pattern=None)
+
+
+def test_no_stdin_error(monkeypatch: MonkeyPatch) -> None:
+    """
+    Couldn't find a better way to test the CLI without patching everything :(
+    """
+    runner = CliRunner()
+    select = Mock()
+    with monkeypatch.context():
+        select.return_value = [[]]
+        monkeypatch.setattr("select.select", select)
+        result = runner.invoke(app)
+    assert "Invalid value" in result.output
