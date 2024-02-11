@@ -1,3 +1,4 @@
+import os
 from io import BytesIO
 from pathlib import Path
 from unittest.mock import Mock
@@ -8,7 +9,7 @@ from typer.testing import CliRunner
 from rexi.cli import app
 
 
-def test_on_args(monkeypatch: MonkeyPatch) -> None:
+def test_no_args(monkeypatch: MonkeyPatch) -> None:
     """
     Couldn't find a better way to test the CLI without patching everything :(
     """
@@ -18,17 +19,20 @@ def test_on_args(monkeypatch: MonkeyPatch) -> None:
     class_mock = Mock()
     instance_mock = Mock()
     open_mock = Mock()
-    select = Mock()
+    read_mock = Mock()
+    isatty_mock = Mock()
 
     with monkeypatch.context():
-        select.return_value = [[True]]
+        read_mock.return_value = ""
         class_mock.return_value = instance_mock
-        monkeypatch.setattr("select.select", select)
+        isatty_mock.return_value = False
+        monkeypatch.setattr("rexi.cli.is_stdin_a_tty", isatty_mock)
         monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
         monkeypatch.setattr("builtins.open", open_mock)
         runner.invoke(app, input=a)
-
-    open_mock.assert_called_once_with("/dev/tty", "rb")
+        open_mock.assert_called_once_with(
+            "con:" if os.name == "nt" else "/dev/tty", "rb"
+        )
     class_mock.assert_called_once_with(
         text.decode(), initial_mode=None, initial_pattern=None
     )
@@ -79,9 +83,10 @@ def test_no_stdin_error(monkeypatch: MonkeyPatch) -> None:
     Couldn't find a better way to test the CLI without patching everything :(
     """
     runner = CliRunner()
-    select = Mock()
+    class_mock = Mock()
+    isatty_mock = Mock()
     with monkeypatch.context():
-        select.return_value = [[]]
-        monkeypatch.setattr("select.select", select)
+        isatty_mock.return_value = True
+        monkeypatch.setattr("rexi.cli.is_stdin_a_tty", isatty_mock)
         result = runner.invoke(app)
     assert "Invalid value" in result.output

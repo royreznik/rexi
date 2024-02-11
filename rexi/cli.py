@@ -1,5 +1,4 @@
 import os
-import select
 import sys
 from typing import Annotated, Optional
 
@@ -9,6 +8,13 @@ from .rexi import RexiApp
 
 app = typer.Typer()
 
+def is_stdin_a_tty() -> bool:
+    """Wrapper for sys.stdin.isatty.
+
+    Trying to directly mock/patch sys.stdin.isatty wasn't working,
+    but it's easy to patch a function that calls sys.stdin.isatty()
+    """
+    return sys.stdin.isatty()
 
 # noinspection SpellCheckingInspection
 @app.command("rexi")
@@ -40,30 +46,20 @@ def rexi_cli(
 ) -> None:
     if input_file:
         input_text = input_file.read()
-    else:
-        """
-        Yep this part is abit ugly.
-        couldn't find a better way to implement it so it will work with `typer`, `pytest` and `textual`
-        """  # noqa: E501
-        if not select.select(
-            [
-                sys.stdin,
-            ],
-            [],
-            [],
-            0.0,
-        )[0]:
-            raise typer.BadParameter(
-                "stdin is empty, "
-                "please provide text thru the stdin "
-                "or use the `-i` flag"
-            )
+    elif not is_stdin_a_tty():
         input_text = sys.stdin.read()
         try:
             os.close(sys.stdin.fileno())
         except OSError:
             pass
-        sys.stdin = open("/dev/tty", "rb")  # type: ignore[assignment]
+        # Windows uses "con:" for stdin device name
+        sys.stdin = open("con:" if os.name == "nt" else "/dev/tty", "rb")  # type: ignore[assignment]
+    else:
+        raise typer.BadParameter(
+            "stdin is empty, "
+            "please provide text thru the stdin "
+            "or use the `-i` flag"
+        )
     app: RexiApp[int] = RexiApp(
         input_text, initial_mode=initial_mode, initial_pattern=initial_pattern
     )
