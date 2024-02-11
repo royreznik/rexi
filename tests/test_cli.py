@@ -83,7 +83,6 @@ def test_no_stdin_error(monkeypatch: MonkeyPatch) -> None:
     Couldn't find a better way to test the CLI without patching everything :(
     """
     runner = CliRunner()
-    class_mock = Mock()
     isatty_mock = Mock()
     with monkeypatch.context():
         isatty_mock.return_value = True
