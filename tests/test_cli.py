@@ -3,10 +3,11 @@ from io import BytesIO
 from pathlib import Path
 from unittest.mock import Mock
 
+import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from typer.testing import CliRunner
 
-from rexi.cli import app
+from rexi.cli import app, is_stdin_a_tty
 
 
 def test_no_args(monkeypatch: MonkeyPatch) -> None:
@@ -89,3 +90,12 @@ def test_no_stdin_error(monkeypatch: MonkeyPatch) -> None:
         monkeypatch.setattr("rexi.cli.is_stdin_a_tty", isatty_mock)
         result = runner.invoke(app)
     assert "Invalid value" in result.output
+
+
+@pytest.mark.parametrize('input_value', [True, False])
+def test_is_stdin_a_tty(monkeypatch: MonkeyPatch, input_value: bool) -> None:
+    isatty_mock = Mock()
+    with monkeypatch.context():
+        isatty_mock.return_value = input_value
+        monkeypatch.setattr("rexi.cli.sys.stdin.isatty", isatty_mock)
+        assert is_stdin_a_tty() == input_value
