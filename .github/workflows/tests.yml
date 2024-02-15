@@ -51,7 +51,7 @@ jobs:
           key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
       - name: install deps
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: rm -rf poetry.lock && make install
+        run: rm poetry.lock && make install
       - name: test
         run: make test
       - uses: codecov/codecov-action@v3
