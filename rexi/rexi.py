@@ -23,7 +23,11 @@ class GroupMatch:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, GroupMatch):
             return False
-        return self.start == other.start and self.end == other.end
+        return (
+            self.start == other.start
+            and self.end == other.end
+            and self.is_first == other.is_first
+        )
 
     def __repr__(self) -> str:
         return f"Group \"{'|'.join(map(str, self.keys))}\": \"{self.value}\""
@@ -117,13 +121,13 @@ class RexiApp(App[ReturnType]):
         first_ends = {group.end for group in groups_matches if group.is_first}
         input_length = len(self.input_content)
         for character in range(input_length):
-            if character in first_starts:
+            if character in first_starts and character not in first_ends:
                 output += UNDERLINE
-            if character in starts:
+            if character in starts and character not in ends:
                 output += Fore.RED
-            if character in ends:
+            if character in ends and character not in starts:
                 output += Fore.RESET
-            if character in first_ends:
+            if character in first_ends and character not in first_starts:
                 output += RESET_UNDERLINE
             output += self.input_content[character]
 

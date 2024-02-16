@@ -28,7 +28,7 @@ def test_group_match_equals(
             ".*(aTe).*",
             "This iS! aTe xt2 F0r T3sT!ng",
             [
-                GroupMatch([0], "This iS! aTe xt2 F0r T3sT!ng", 0, 28),
+                GroupMatch([0], "This iS! aTe xt2 F0r T3sT!ng", 0, 28, True),
                 GroupMatch([1], "aTe", 9, 12),
             ],
         ],
@@ -36,7 +36,7 @@ def test_group_match_equals(
             ".*(?P<name>aTe).*",
             "This iS! aTe xt2 F0r T3sT!ng",
             [
-                GroupMatch([0], "This iS! aTe xt2 F0r T3sT!ng", 0, 28),
+                GroupMatch([0], "This iS! aTe xt2 F0r T3sT!ng", 0, 28, True),
                 GroupMatch([1, "name"], "aTe", 9, 12),
             ],
         ],
