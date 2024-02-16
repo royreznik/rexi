@@ -1,27 +1,30 @@
 BUMP_PART ?=
 PYTEST_COV ?= xml
+
+POETRY ?= poetry
+
 setup:
 	python3 -m pip install poetry
 
 install:
-	poetry install
+	$(POETRY) install
 
 test:
-	poetry run pytest -ssv --cov --cov-report=$(PYTEST_COV)
+	$(POETRY) run pytest -ssv --cov --cov-report=$(PYTEST_COV)
 
 build:
-	poetry build
+	$(POETRY) build
 
 publish: build
-	poetry publish
+	$(POETRY) publish
 
 format:
-	poetry run ruff format rexi/ tests/
-	poetry run ruff --fix rexi/ tests/
+	$(POETRY) run ruff format rexi/ tests/
+	$(POETRY) run ruff --fix rexi/ tests/
 
 lint:
-	poetry run ruff rexi/ tests/
-	poetry run mypy rexi/ tests/
+	$(POETRY) run ruff rexi/ tests/
+	$(POETRY) run mypy rexi/ tests/
 
 bump:
-	poetry run bump-my-version bump $(BUMP_PART)
+	$(POETRY) run bump-my-version bump $(BUMP_PART)

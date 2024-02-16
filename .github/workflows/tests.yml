@@ -53,11 +53,13 @@ jobs:
           path: .venv
           key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
       - name: install windows deps
-        if: matrix.os == 'windows-latest'
-        run: choco install make
+        if: runner.os == 'Windows'
+        run: |
+          choco install make
+          echo ("POETRY=/c/Users/runneradmin/.local/bin/poetry.exe") >> $env:GITHUB_ENV
       - name: install deps
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: rm poetry.lock && make install
+        run: echo rm poetry.lock && make install
       - name: test
         run: make test
       - uses: codecov/codecov-action@v3
