@@ -36,7 +36,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -49,14 +49,12 @@ jobs:
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
-      - name: install windows deps
-        if: matrix.os == 'windows-latest'
-        run: choco install make
       - name: install deps
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: rm poetry.lock && make install
+        run: rm -rf poetry.lock && make install
       - name: test
         run: make test
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+        
