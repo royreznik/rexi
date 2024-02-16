@@ -16,8 +16,8 @@ publish: build
 	poetry publish
 
 format:
-	poetry run ruff --fix rexi/ tests/
 	poetry run ruff format rexi/ tests/
+	poetry run ruff --fix rexi/ tests/
 
 lint:
 	poetry run ruff rexi/ tests/
