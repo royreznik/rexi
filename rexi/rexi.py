@@ -5,8 +5,11 @@ from typing import Iterable, Match, Optional, cast
 from colorama import Fore
 from textual import on
 from textual.app import App, ComposeResult, ReturnType
-from textual.containers import Horizontal, ScrollableContainer
-from textual.widgets import Header, Input, Select, Static
+from textual.containers import Container, Horizontal, ScrollableContainer
+from textual.screen import ModalScreen
+from textual.widgets import Button, Header, Input, Label, Select, Static
+
+from rexi.regex_help import REGEX_HELP
 
 UNDERLINE = "\033[4m"
 RESET_UNDERLINE = "\033[24m"
@@ -31,6 +34,22 @@ class GroupMatch:
 
     def __repr__(self) -> str:
         return f"Group \"{'|'.join(map(str, self.keys))}\": \"{self.value}\""
+
+
+class Help(ModalScreen[ReturnType]):
+    def compose(self) -> ComposeResult:
+        with Container():
+            yield Label("Help for regex:")
+            with Horizontal():
+                help_keys = "\n".join(REGEX_HELP.keys())
+                help_values = "\n".join(REGEX_HELP.values())
+                yield Static(help_keys, classes="helpKeys")
+                yield Static(help_values, classes="helpValues")
+            yield Button("Close", id="exitHelp", variant="success")
+
+    @on(Button.Pressed, "#exitHelp")
+    def back_to_app(self) -> None:
+        self.app.pop_screen()
 
 
 # noinspection SpellCheckingInspection
@@ -67,7 +86,7 @@ class RexiApp(App[ReturnType]):
                 allow_blank=False,
                 value=self.regex_current_mode,
             )
-
+            yield Button("Help", id="help")
         with ScrollableContainer(id="result"):
             with ScrollableContainer(id="output-container"):
                 with Header():
@@ -77,6 +96,9 @@ class RexiApp(App[ReturnType]):
                 with Header():
                     yield Static("Groups")
                 yield Static(id="groups")
+
+    def on_button_pressed(self) -> None:
+        self.push_screen(Help())
 
     @on(Input.Changed)
     async def on_input_changed(self, message: Input.Changed) -> None:

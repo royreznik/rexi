@@ -53,7 +53,8 @@ async def test_switch_modes() -> None:
     async with app.run_test() as pilot:
         assert app.regex_current_mode == "finditer"
         await pilot.click("SelectCurrent")
-        await pilot.click("SelectOverlay", offset=(2, 2))
+        await pilot.press("down")
+        await pilot.press("enter")
         await pilot.wait_for_animation()
         assert app.regex_current_mode == "match"
 
