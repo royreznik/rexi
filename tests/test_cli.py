@@ -92,7 +92,7 @@ def test_no_stdin_error(monkeypatch: MonkeyPatch) -> None:
     assert "Invalid value" in result.output
 
 
-@pytest.mark.parametrize('input_value', [True, False])
+@pytest.mark.parametrize("input_value", [True, False])
 def test_is_stdin_a_tty(monkeypatch: MonkeyPatch, input_value: bool) -> None:
     isatty_mock = Mock()
     with monkeypatch.context():
