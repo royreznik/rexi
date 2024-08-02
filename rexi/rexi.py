@@ -56,11 +56,11 @@ class RexiApp(App[ReturnType]):
         self.input_content: str = input_content
         self.regex_modes: list[str] = RexiApp.AVAILABLE_MODES
         self.regex_current_mode: str = initial_mode
-        self.initial_pattern = initial_pattern
+        self.pattern = initial_pattern
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="inputs"):
-            yield Input(value=self.initial_pattern, placeholder="Enter regex pattern")
+            yield Input(value=self.pattern, placeholder="Enter regex pattern")
             yield Select(
                 zip(self.regex_modes, self.regex_modes),
                 id="select",
@@ -80,6 +80,7 @@ class RexiApp(App[ReturnType]):
 
     @on(Input.Changed)
     async def on_input_changed(self, message: Input.Changed) -> None:
+        self.pattern = message.value
         self.run_worker(self.update_regex(message.value), exclusive=True)
 
     @on(Select.Changed)

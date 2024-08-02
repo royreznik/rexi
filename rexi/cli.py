@@ -64,3 +64,4 @@ def rexi_cli(
         input_text, initial_mode=initial_mode, initial_pattern=initial_pattern
     )
     app.run()
+    print(app.pattern)
