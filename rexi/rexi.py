@@ -9,7 +9,7 @@ from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.screen import ModalScreen
 from textual.widgets import Button, Header, Input, Label, Select, Static
 
-from rexi.regex_help import REGEX_HELP
+from .regex_help import REGEX_HELP
 
 UNDERLINE = "\033[4m"
 RESET_UNDERLINE = "\033[24m"
@@ -75,11 +75,11 @@ class RexiApp(App[ReturnType]):
         self.input_content: str = input_content
         self.regex_modes: list[str] = RexiApp.AVAILABLE_MODES
         self.regex_current_mode: str = initial_mode
-        self.initial_pattern = initial_pattern
+        self.pattern = initial_pattern
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="inputs"):
-            yield Input(value=self.initial_pattern, placeholder="Enter regex pattern")
+            yield Input(value=self.pattern, placeholder="Enter regex pattern")
             yield Select(
                 zip(self.regex_modes, self.regex_modes),
                 id="select",
@@ -97,11 +97,13 @@ class RexiApp(App[ReturnType]):
                     yield Static("Groups")
                 yield Static(id="groups")
 
-    def on_button_pressed(self) -> None:
-        self.push_screen(Help())
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "help":
+            self.push_screen(Help())
 
     @on(Input.Changed)
     async def on_input_changed(self, message: Input.Changed) -> None:
+        self.pattern = message.value
         self.run_worker(self.update_regex(message.value), exclusive=True)
 
     @on(Select.Changed)
