@@ -8,6 +8,7 @@ from .rexi import RexiApp
 
 app = typer.Typer()
 
+
 def is_stdin_a_tty() -> bool:
     """Wrapper for sys.stdin.isatty.
 
@@ -15,6 +16,7 @@ def is_stdin_a_tty() -> bool:
     but it's easy to patch a function that calls sys.stdin.isatty()
     """
     return sys.stdin.isatty()
+
 
 # noinspection SpellCheckingInspection
 @app.command("rexi")
