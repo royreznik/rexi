@@ -58,6 +58,12 @@ async def test_switch_modes() -> None:
         await pilot.wait_for_animation()
         assert app.regex_current_mode == "match"
 
+async def test_help() -> None:
+    app: RexiApp[int] = RexiApp("This iS! aTe xt2 F0r T3sT!ng")
+    async with app.run_test() as pilot:
+        await pilot.click("#help")
+        await pilot.wait_for_animation()
+        await pilot.click("#exitHelp")
 
 async def test_invalide_mode() -> None:
     with pytest.raises(ValueError):
