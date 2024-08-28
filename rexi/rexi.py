@@ -9,7 +9,7 @@ from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.screen import ModalScreen
 from textual.widgets import Button, Header, Input, Label, Select, Static
 
-from rexi.regex_help import REGEX_HELP
+from .regex_help import REGEX_HELP
 
 UNDERLINE = "\033[4m"
 RESET_UNDERLINE = "\033[24m"
@@ -97,8 +97,9 @@ class RexiApp(App[ReturnType]):
                     yield Static("Groups")
                 yield Static(id="groups")
 
-    def on_button_pressed(self) -> None:
-        self.push_screen(Help())
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "help":
+            self.push_screen(Help())
 
     @on(Input.Changed)
     async def on_input_changed(self, message: Input.Changed) -> None:
