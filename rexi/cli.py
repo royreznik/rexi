@@ -56,8 +56,29 @@ def rexi_cli(
 
     If `--input FILE` is used, read the file content.
     """
+    # Read stdin
+    # Should be first, otherwise stdin is passed to textual
+    if not is_stdin_a_tty():
+        input_text = sys.stdin.read()
+        try:
+            os.close(sys.stdin.fileno())
+        except OSError:
+            pass
+        # Windows uses "con:" for stdin device name
+        sys.stdin = open("con:" if os.name == "nt" else "/dev/tty", "rb")  # type: ignore[assignment]
+
+        # Incompatible with an input file argument
+        if input_file:
+            msg = "INPUT option should not be defined if text is piped through stdin."
+            raise typer.BadParameter(msg)
+
+        # Incompatible with a string argument
+        if text:
+            msg = "TEXT argument should be empty if text is piped through stdin."
+            raise typer.BadParameter(msg)
+
     # Input file provided
-    if input_file:
+    elif input_file:
         # Incompatible with a string argument
         if text:
             msg = (
@@ -67,21 +88,6 @@ def rexi_cli(
             raise typer.BadParameter(msg)
 
         input_text = input_file.read()
-
-    # Read stdin
-    elif not is_stdin_a_tty():
-        input_text = sys.stdin.read()
-        try:
-            os.close(sys.stdin.fileno())
-        except OSError:
-            pass
-        # Windows uses "con:" for stdin device name
-        sys.stdin = open("con:" if os.name == "nt" else "/dev/tty", "rb")  # type: ignore[assignment]
-
-        # Incompatible with a string argument
-        if text:
-            msg = "TEXT argument should be empty if text is piped through stdin."
-            raise typer.BadParameter(msg)
 
     # Input string provided or fallback to empty string
     else:
