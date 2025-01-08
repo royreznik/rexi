@@ -1,6 +1,7 @@
 import os
 from io import BytesIO
 from pathlib import Path
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
@@ -113,7 +114,7 @@ def test_argument_conflicts(
     text_string = "string: ThaT iS! éhé"
     # Text input file
     text_input = "input: This iS! aTe xt2 F0r T3sT!ng"
-    tmp_file = (tmp_path / "text_file")
+    tmp_file = tmp_path / "text_file"
     tmp_file.write_text(text_input)
 
     # Initialize mocks
@@ -128,7 +129,7 @@ def test_argument_conflicts(
         monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
         class_mock.return_value = instance_mock
 
-        kwargs = {}
+        kwargs: dict[str, Any] = {}
         args = []
         if use_stdin:
             kwargs["input"] = a
