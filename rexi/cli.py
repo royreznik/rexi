@@ -21,12 +21,18 @@ def is_stdin_a_tty() -> bool:
 # noinspection SpellCheckingInspection
 @app.command("rexi")
 def rexi_cli(
+    text: Annotated[
+        Optional[str],
+        typer.Argument(
+            help="String to pass to rexi; if not provided, stdin will be used.",
+        ),
+    ] = None,
     input_file: Annotated[
         Optional[typer.FileText],
         typer.Option(
             "--input",
             "-i",
-            help="Input file to pass to rexi; if not provided, stdin will be used.",
+            help="Input file to pass to rexi; if used, TEXT should be empty.",
         ),
     ] = None,
     initial_pattern: Annotated[
@@ -46,9 +52,13 @@ def rexi_cli(
         ),
     ] = None,
 ) -> None:
-    if input_file:
-        input_text = input_file.read()
-    elif not is_stdin_a_tty():
+    """Try regex patterns on a string.
+
+    If `--input FILE` is used, read the file content.
+    """
+    # Read stdin
+    # Should be first, otherwise stdin is passed to textual
+    if not is_stdin_a_tty():
         input_text = sys.stdin.read()
         try:
             os.close(sys.stdin.fileno())
@@ -56,14 +66,37 @@ def rexi_cli(
             pass
         # Windows uses "con:" for stdin device name
         sys.stdin = open("con:" if os.name == "nt" else "/dev/tty", "rb")  # type: ignore[assignment]
+
+        # Incompatible with an input file argument
+        if input_file:
+            msg = "INPUT option should not be defined if text is piped through stdin."
+            raise typer.BadParameter(msg)
+
+        # Incompatible with a string argument
+        if text:
+            msg = "TEXT argument should be empty if text is piped through stdin."
+            raise typer.BadParameter(msg)
+
+    # Input file provided
+    elif input_file:
+        # Incompatible with a string argument
+        if text:
+            msg = (
+                "TEXT argument should be empty if in input is provided with "
+                "the `-i` flag."
+            )
+            raise typer.BadParameter(msg)
+
+        input_text = input_file.read()
+
+    # Input string provided or fallback to empty string
     else:
-        raise typer.BadParameter(
-            "stdin is empty, "
-            "please provide text thru the stdin "
-            "or use the `-i` flag"
-        )
+        input_text = text or ""
+
     app: RexiApp[int] = RexiApp(
-        input_text, initial_mode=initial_mode, initial_pattern=initial_pattern
+        input_text,
+        initial_mode=initial_mode,
+        initial_pattern=initial_pattern,
     )
     app.run()
     print(app.pattern)
