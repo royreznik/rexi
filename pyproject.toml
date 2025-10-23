@@ -24,6 +24,7 @@ python = "^3.10"
 colorama = "^0.4.6"
 typer = "^0.9.0"
 textual = "^0.52.1"
+click = "~=8.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
