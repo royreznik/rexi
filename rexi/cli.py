@@ -50,12 +50,20 @@ def rexi_cli(
         input_text = input_file.read()
     elif not is_stdin_a_tty():
         input_text = sys.stdin.read()
+        # Reopen stdin from the console device so Textual can read
+        # interactive input (keyboard + mouse events).
+        # We must place it on fd 0 so that Textual's low-level input
+        # reader sees the console, not the closed pipe.
+        console_device = "CONIN$" if os.name == "nt" else "/dev/tty"
         try:
             os.close(sys.stdin.fileno())
         except OSError:
             pass
-        # Windows uses "con:" for stdin device name
-        sys.stdin = open("con:" if os.name == "nt" else "/dev/tty", "rb")  # type: ignore[assignment]
+        new_fd = os.open(console_device, os.O_RDONLY)
+        if new_fd != 0:
+            os.dup2(new_fd, 0)
+            os.close(new_fd)
+        sys.stdin = os.fdopen(0, "r", closefd=False)  # type: ignore[assignment]
     else:
         raise typer.BadParameter(
             "stdin is empty, "
