@@ -37,7 +37,9 @@ def _reopen_stdin_unix() -> None:
     if new_fd != 0:
         os.dup2(new_fd, 0)
         os.close(new_fd)
-    sys.stdin = os.fdopen(0, "r", closefd=False)  # type: ignore[assignment]
+    new_stdin = os.fdopen(0, "r", closefd=False)
+    sys.stdin = new_stdin  # type: ignore[assignment]
+    sys.__stdin__ = new_stdin  # type: ignore[assignment]
 
 
 def _reopen_stdin_windows() -> None:
@@ -46,20 +48,26 @@ def _reopen_stdin_windows() -> None:
 
     kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
     STD_INPUT_HANDLE = wintypes.DWORD(-10)
-    GENERIC_READ = wintypes.DWORD(0x80000000)
-    FILE_SHARE_READ = wintypes.DWORD(0x00000001)
+    GENERIC_READ_WRITE = wintypes.DWORD(0x80000000 | 0x40000000)
+    FILE_SHARE_READ_WRITE = wintypes.DWORD(0x00000001 | 0x00000002)
     OPEN_EXISTING = wintypes.DWORD(3)
 
-    # Open a fresh handle to the console input buffer
+    # Open a fresh handle to the console input buffer.
+    # Textual's win32.EventMonitor calls GetStdHandle(STD_INPUT_HANDLE)
+    # then ReadConsoleInputW on it, so we need to redirect that handle.
+    # Textual's enable_application_mode() also calls
+    # msvcrt.get_osfhandle(sys.__stdin__.fileno()) to set console mode
+    # (including ENABLE_VIRTUAL_TERMINAL_INPUT for mouse), so we must
+    # fix sys.__stdin__ as well.
     handle = kernel32.CreateFileW(
-        "CONIN$", GENERIC_READ, FILE_SHARE_READ,
+        "CONIN$", GENERIC_READ_WRITE, FILE_SHARE_READ_WRITE,
         None, OPEN_EXISTING, wintypes.DWORD(0), None,
     )
 
-    # Point the Windows STD_INPUT_HANDLE at the console
+    # Point the Windows STD_INPUT_HANDLE at the real console
     kernel32.SetStdHandle(STD_INPUT_HANDLE, handle)
 
-    # Also fix fd 0 and sys.stdin for any code that reads from them
+    # Fix fd 0 so msvcrt.get_osfhandle(0) returns the console handle
     try:
         os.close(sys.stdin.fileno())
     except OSError:
@@ -68,7 +76,11 @@ def _reopen_stdin_windows() -> None:
     if new_fd != 0:
         os.dup2(new_fd, 0)
         os.close(new_fd)
-    sys.stdin = os.fdopen(0, "r", closefd=False)  # type: ignore[assignment]
+
+    # Fix both sys.stdin and sys.__stdin__ — Textual reads from __stdin__
+    new_stdin = os.fdopen(0, "r", closefd=False)
+    sys.stdin = new_stdin  # type: ignore[assignment]
+    sys.__stdin__ = new_stdin  # type: ignore[assignment]
 
 
 def is_stdin_a_tty() -> bool:
