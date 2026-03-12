@@ -32,7 +32,7 @@ async def test_input_box(start_mode: str, pattern: str, expected_output: str) ->
     async with app.run_test() as pilot:
         await pilot.click("Input")
         await pilot.press(*list(pattern))
-        result = str(cast(Static, app.query_one("#output")).renderable)
+        result = str(cast(Static, app.query_one("#output")).content)
         assert result == expected_output
 
 
@@ -41,7 +41,7 @@ async def test_input_box_with_initial_pattern() -> None:
         "This iS! aTe xt2 F0r T3sT!ng", initial_pattern="(This.*iS!)"
     )
     async with app.run_test():
-        result = str(cast(Static, app.query_one("#output")).renderable)
+        result = str(cast(Static, app.query_one("#output")).content)
         assert (
             result
             == f"{UNDERLINE}{Fore.RED}This iS!{Fore.RESET}{RESET_UNDERLINE} aTe xt2 F0r T3sT!ng"  # noqa: E501

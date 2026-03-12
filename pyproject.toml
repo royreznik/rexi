@@ -1,9 +1,10 @@
-[tool.poetry]
+[project]
 name = "rexi"
 version = "1.2.1"
 description = "Simpel and Interactive regex shell"
-authors = ["Roy Reznik <royreznik@gmail.com>"]
+authors = [{name = "Roy Reznik", email = "royreznik@gmail.com"}]
 readme = "README.md"
+requires-python = ">=3.10"
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -13,38 +14,39 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12"
 ]
-homepage = "https://github.com/royreznik/rexi"
-repository = "https://github.com/royreznik/rexi"
+dependencies = [
+    "colorama>=0.4.6",
+    "typer>=0.9.0",
+    "textual>=0.86.1",
+    "click>=8.1.0,<8.2.0",
+]
 
-[tool.poetry.scripts]
+[project.urls]
+Homepage = "https://github.com/royreznik/rexi"
+Repository = "https://github.com/royreznik/rexi"
+
+[project.scripts]
 rexi = "rexi.cli:app"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-colorama = "^0.4.6"
-typer = "^0.9.0"
-textual = "^0.86.1"
-click = "~=8.1.0"
-
-
-[tool.poetry.group.dev.dependencies]
-textual-dev = "^1.4.0"
-black = "^24.1.1"
-pytest = "^7.4.3"
-ruff = "^0.1.9"
-mypy = "^1.8.0"
-pytest-cov = "^4.1.0"
-bump-my-version = "^0.15.4"
-types-colorama = "^0.4.15.20240106"
-pytest-asyncio = "^0.23.4"
-ipdb = "^0.13.13"
+[dependency-groups]
+dev = [
+    "textual-dev>=1.4.0",
+    "black>=24.1.1",
+    "pytest>=7.4.3",
+    "ruff>=0.1.9",
+    "mypy>=1.8.0",
+    "pytest-cov>=4.1.0",
+    "bump-my-version>=0.28.0",
+    "types-colorama>=0.4.15.20240106",
+    "pytest-asyncio>=0.23.4",
+    "ipdb>=0.13.13",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "B", "I"]
 
 [tool.mypy]
 strict = true
-
 
 [tool.bumpversion]
 current_version = "1.2.0"
@@ -67,25 +69,9 @@ regex = true
 search = "^version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 
-
-
-
-
-
-
-
-
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 
-
-
-
-
-
-
-
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
