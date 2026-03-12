@@ -23,8 +23,7 @@ def test_no_args(monkeypatch: MonkeyPatch) -> None:
     read_mock = Mock()
     isatty_mock = Mock()
 
-    os_open_mock = Mock(return_value=0)
-    os_fdopen_mock = Mock()
+    reopen_mock = Mock()
 
     with monkeypatch.context():
         read_mock.return_value = ""
@@ -32,12 +31,9 @@ def test_no_args(monkeypatch: MonkeyPatch) -> None:
         isatty_mock.return_value = False
         monkeypatch.setattr("rexi.cli.is_stdin_a_tty", isatty_mock)
         monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
-        monkeypatch.setattr("rexi.cli.os.open", os_open_mock)
-        monkeypatch.setattr("rexi.cli.os.fdopen", os_fdopen_mock)
+        monkeypatch.setattr("rexi.cli._reopen_stdin", reopen_mock)
         runner.invoke(app, input=a)
-        os_open_mock.assert_called_once_with(
-            "CONIN$" if os.name == "nt" else "/dev/tty", os.O_RDONLY
-        )
+        reopen_mock.assert_called_once()
     class_mock.assert_called_once_with(
         text.decode(), initial_mode=None, initial_pattern=None
     )
