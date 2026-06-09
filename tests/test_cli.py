@@ -1,5 +1,4 @@
 import os
-from io import BytesIO
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -16,7 +15,6 @@ def test_no_args(monkeypatch: MonkeyPatch) -> None:
     """
     runner = CliRunner()
     text = b"This iS! aTe xt2 F0r T3sT!ng"
-    a = BytesIO(text)
     class_mock = Mock()
     instance_mock = Mock()
     open_mock = Mock()
@@ -30,7 +28,7 @@ def test_no_args(monkeypatch: MonkeyPatch) -> None:
         monkeypatch.setattr("rexi.cli.is_stdin_a_tty", isatty_mock)
         monkeypatch.setattr("rexi.cli.RexiApp", class_mock)
         monkeypatch.setattr("builtins.open", open_mock)
-        runner.invoke(app, input=a)
+        runner.invoke(app, input=text)
         open_mock.assert_called_once_with(
             "con:" if os.name == "nt" else "/dev/tty", "rb"
         )
