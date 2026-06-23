@@ -7,15 +7,27 @@ Input {
 }
 
 #select {
-    width: 15%;
+    width: 10%;
+}
+
+#modify {
+    border: solid;
+    width: 10%;
 }
 
 #help {
-    width: 15%;
+    border: solid;
+    width: 10%;
 }
 
 #inputs {
     height: 4;
+}
+
+#modal-container {
+    margin: 5 0;
+    width: 100%;
+    height: 70%;
 }
 
 Help {

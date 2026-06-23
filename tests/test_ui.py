@@ -58,13 +58,31 @@ async def test_switch_modes() -> None:
         await pilot.wait_for_animation()
         assert app.regex_current_mode == "match"
 
+
 async def test_help() -> None:
     app: RexiApp[int] = RexiApp("This iS! aTe xt2 F0r T3sT!ng")
-    async with app.run_test() as pilot:
+    async with app.run_test(size=(100, 50)) as pilot:
         await pilot.click("#help")
         await pilot.wait_for_animation()
         await pilot.click("#exitHelp")
 
+
 async def test_invalide_mode() -> None:
     with pytest.raises(ValueError):
         RexiApp("random text", initial_mode="NON-EXISTING-MODE")
+
+
+async def test_modify_content() -> None:
+    app: RexiApp[int] = RexiApp("")
+    async with app.run_test() as pilot:
+        await pilot.click("#modify")
+        await pilot.wait_for_animation()
+        await pilot.press("k")
+        await pilot.click("#applyOutput")
+        assert app.input_content == "k"
+
+        await pilot.click("#modify")
+        await pilot.wait_for_animation()
+        await pilot.press("d")
+        await pilot.click("#cancelOutput")
+        assert app.input_content == "k"
